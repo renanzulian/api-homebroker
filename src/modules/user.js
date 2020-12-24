@@ -29,6 +29,7 @@ exports.registerUser = async (name, email, password) => {
     password: hashPassword,
   });
   await newUser.save();
+  await walletModule.createWallet(newUser.id);
   return await this.login(newUser.email, password);
 };
 

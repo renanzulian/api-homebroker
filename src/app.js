@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://localhost:27017/homebroker", {
+  .connect("mongodb+srv://api-hb:0QYTOE0d5XgaOuAo@hb1.iu1bi.mongodb.net/homebroker?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -100,7 +100,7 @@ app.post("/trade", loginRequired, async (req, res) => {
       res.status(500).send(error.message);
     }
   } else {
-    req.sendStatus(400);
+    res.sendStatus(400);
   }
 });
 
