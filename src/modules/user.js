@@ -39,6 +39,20 @@ exports.registerUser = async (name, email, password) => {
   };
 };
 
+exports.getUserData = async (userId) => {
+  const user = await User.findById(userId);
+  const wallet = await walletModule.findWallet(userId);
+  const tickers = wallet.stonks.map((stk) => stk.ticker);
+  const transactions = await walletModule.findTransactions(wallet.id, tickers);
+  return {
+    name: user.name,
+    email: user.email,
+    balance: wallet.balance,
+    stonks: wallet.stonks,
+    transactions: transactions,
+  };
+};
+
 exports.login = async (email, password) => {
   const user = await User.findOne({ email: email });
   if (user) {

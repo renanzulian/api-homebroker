@@ -79,6 +79,11 @@ const loginRequired = (req, res, next) => {
   }
 };
 
+app.get("/wallet", loginRequired, async (req, res) => {
+  const response = await userModule.getUserData(req.user.id);
+  return res.json(response)
+});
+
 app.post("/trade", loginRequired, async (req, res) => {
   const tradeData = req.body;
   if (tradeData.ticker && tradeData.quantity && tradeData.price) {

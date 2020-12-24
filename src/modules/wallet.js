@@ -58,6 +58,13 @@ exports.findWallet = async (userId) => {
   return await Wallet.findOne({ userId: userId });
 };
 
+exports.findTransactions = async (walletId, tickers) => {
+  return await Transaction.find({
+    walletId: walletId,
+    ticker: tickers,
+  });
+};
+
 exports.createWallet = async (userId) => {
   const newWallet = new Wallet({ userId: userId });
   return await newWallet.save();
