@@ -54,6 +54,10 @@ const Transaction = mongoose.model(
   "transactions"
 );
 
+exports.findWallet = async (userId) => {
+  return await Wallet.findOne({ userId: userId });
+};
+
 exports.createWallet = async (userId) => {
   const newWallet = new Wallet({ userId: userId });
   return await newWallet.save();

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const walletModule = require("./wallet");
+const jwt = require("jsonwebtoken");
 
 const userSchema = mongoose.Schema({
   email: {
@@ -27,18 +29,33 @@ exports.registerUser = async (name, email, password) => {
     password: hashPassword,
   });
   await newUser.save();
+  const userWallet = await walletModule.createWallet(newUser.id);
   return {
-    id: newUser.id,
+    userId: userWallet.userId,
+    walletId: walletModule.id,
     name: newUser.name,
-    email: newUser.email
-  }
+    email: newUser.email,
+    balance: userWallet.balance,
+  };
 };
 
 exports.login = async (email, password) => {
   const user = await User.findOne({ email: email });
   if (user) {
     if (await bcrypt.compare(password, user.password)) {
-      return user;
+      const token = jwt.sign(
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+        "hard-secret-jwt"
+      );
+      return {
+        token: token,
+        name: user.name,
+        email: user.email,
+      };
     }
     throw new Error("Invalid credentials");
   }
