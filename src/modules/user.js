@@ -29,14 +29,7 @@ exports.registerUser = async (name, email, password) => {
     password: hashPassword,
   });
   await newUser.save();
-  const userWallet = await walletModule.createWallet(newUser.id);
-  return {
-    userId: userWallet.userId,
-    walletId: walletModule.id,
-    name: newUser.name,
-    email: newUser.email,
-    balance: userWallet.balance,
-  };
+  return await this.login(newUser.email, password);
 };
 
 exports.getUserData = async (userId) => {

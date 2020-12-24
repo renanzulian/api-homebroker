@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 const walletSchema = mongoose.Schema({
   userId: {
@@ -152,4 +153,17 @@ updateWalletStonk = (wallet, ticker, quantity, total) => {
       wallet.balance = newBalance;
     }
   }
+};
+
+exports.getStonkDetails = async (ticker) => {
+  const priceResponse = await axios.get(
+    `https://www.alphavantage.co/query?symbol=${ticker}&function=TIME_SERIES_DAILY&apikey=KDHDQ1SL8QJT0ALN`
+  );
+  const details = priceResponse.data;
+  return {
+    currentPrice:
+      details["Time Series (Daily)"][details["Meta Data"]["3. Last Refreshed"]][
+        "4. close"
+      ],
+  };
 };
