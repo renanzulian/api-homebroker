@@ -97,6 +97,7 @@ addStonkInWallet = (wallet, ticker, quantity, total) => {
   } else {
     if (wallet.stonks.length < 3) {
       wallet.stonks.push({ ticker: ticker, quantity: quantity });
+      wallet.balance -= Math.abs(total);
     } else {
       throw new Error("Wallet should contains only 3 stonks");
     }

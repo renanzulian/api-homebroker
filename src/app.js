@@ -2,7 +2,9 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const user = require("./modules/user");
+const userModule = require("./modules/user");
+const walletModule = require("./modules/wallet");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -27,7 +29,7 @@ app.post("/register", async (req, res) => {
   const userData = req.body;
   if (userData.name && userData.email && userData.password) {
     try {
-      const result = await user.registerUser(
+      const result = await userModule.registerUser(
         userData.name,
         userData.email,
         userData.password
@@ -46,7 +48,7 @@ app.post("/login", async (req, res) => {
   const userData = req.body;
   if (userData.email && userData.password) {
     try {
-      const result = await user.login(userData.email, userData.password);
+      const result = await userModule.login(userData.email, userData.password);
       res.json(result);
     } catch (error) {
       console.log(error.message);
@@ -64,6 +66,36 @@ app.post("/login", async (req, res) => {
     }
   } else {
     res.sendStatus(400);
+  }
+});
+
+const loginRequired = (req, res, next) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    req.user = jwt.verify(token, "hard-secret-jwt");
+    next();
+  } catch (error) {
+    res.sendStatus(401);
+  }
+};
+
+app.post("/trade", loginRequired, async (req, res) => {
+  const tradeData = req.body;
+  if (tradeData.ticker && tradeData.quantity && tradeData.price) {
+    try {
+      await walletModule.toTradeStonks(
+        req.user.id,
+        tradeData.ticker,
+        tradeData.quantity,
+        tradeData.price
+      );
+      res.sendStatus(200);
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).send(error.message);
+    }
+  } else {
+    req.sendStatus(400);
   }
 });
 
