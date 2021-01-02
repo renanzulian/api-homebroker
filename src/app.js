@@ -14,10 +14,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 mongoose
-  .connect("mongodb+srv://api-hb:0QYTOE0d5XgaOuAo@hb1.iu1bi.mongodb.net/homebroker?retryWrites=true&w=majority", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    "mongodb+srv://api-hb:0QYTOE0d5XgaOuAo@hb1.iu1bi.mongodb.net/homebroker?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => {
     console.log("Mongoose connect");
   })
@@ -81,7 +84,7 @@ const loginRequired = (req, res, next) => {
 
 app.get("/wallet", loginRequired, async (req, res) => {
   const response = await userModule.getUserData(req.user.id);
-  return res.json(response)
+  return res.json(response);
 });
 
 app.post("/trade", loginRequired, async (req, res) => {
@@ -108,6 +111,4 @@ app.use("*", (req, res) => {
   res.sendStatus(404);
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Api running`);
-});
+module.exports = app;
