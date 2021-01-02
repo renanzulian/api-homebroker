@@ -1,25 +1,7 @@
-const mongoose = require("mongoose");
+const User = require("./models");
 const bcrypt = require("bcrypt");
-const walletModule = require("./wallet");
+const walletController = require("../wallet/controller");
 const jwt = require("jsonwebtoken");
-
-const userSchema = mongoose.Schema({
-  email: {
-    type: String,
-    require: true,
-    unique: true,
-  },
-  name: {
-    type: String,
-    require: true,
-  },
-  password: {
-    type: String,
-    require: true,
-  },
-});
-
-const User = mongoose.model("User", userSchema, "users");
 
 exports.registerUser = async (name, email, password) => {
   const hashPassword = await bcrypt.hash(password, 10);
@@ -29,15 +11,18 @@ exports.registerUser = async (name, email, password) => {
     password: hashPassword,
   });
   await newUser.save();
-  await walletModule.createWallet(newUser.id);
+  await walletController.createWallet(newUser.id);
   return await this.login(newUser.email, password);
 };
 
 exports.getUserData = async (userId) => {
   const user = await User.findById(userId);
-  const wallet = await walletModule.findWallet(userId);
+  const wallet = await walletController.findWallet(userId);
   const tickers = wallet.stonks.map((stk) => stk.ticker);
-  const transactions = await walletModule.findTransactions(wallet.id, tickers);
+  const transactions = await walletController.findTransactions(
+    wallet.id,
+    tickers
+  );
   return {
     name: user.name,
     email: user.email,
